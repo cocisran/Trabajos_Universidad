@@ -1,2 +1,2 @@
-# Proyectos, Practiccas y Codigos de la carrera Ciencias de la Computacion
+# Proyectos, Prácticas y Códigos de la carrera Ciencias de la Computación
 
