@@ -1,0 +1,32 @@
+plugins {
+    id 'java';
+    id 'application'
+}
+
+repositories {
+    sourceSets.main.java.srcDirs = ['src']
+    sourceSets.test.java.srcDirs = ['src']
+    mavenCentral()
+    mavenLocal()
+    mainClassName = 'main.app.Main'
+}
+
+
+dependencies {
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'org.junit.jupiter:junit-jupiter-api:5.0.3'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.0.3'
+}
+
+sourceSets {
+    main.java.srcDirs += 'src'
+    test.java.srcDirs += 'test'
+}
+
+
+test{
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}

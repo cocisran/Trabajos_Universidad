@@ -1,0 +1,115 @@
+\documentclass[12PT]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[utf8]{inputenc}
+\usepackage{anysize} 
+\usepackage{algpseudocode}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{multicol}
+\usepackage{pgf}
+\usetikzlibrary{arrows,automata}
+\usetikzlibrary{positioning}
+\usepackage{caption}
+
+\captionsetup[figure]{labelformat=empty} %eliminar figure
+\marginsize{2cm}{2cm}{2.5cm}{2.5cm}
+\begin{document}
+\pagestyle{empty}
+\begin{figure}[ht]
+    \includegraphics[width = 17cm]{portada.png}
+    \caption{}
+    \label{portada}
+\end{figure}
+\thispagestyle{empty}
+\clearpage
+
+\section*{Objetivo.}
+Nuestro cliente, el aeropuerto de la Ciudad de México, nos contrató para que en base a los archivos proporcionados con información acerca de los vuelos que salen el mismo día que se ejecutará el programa, se obtenga la información climática correspondiente a la ciudad de salida y de llegada. Nuestro objetivo con este programa es brindar un medio para que el aeropuerto puede conocer de manera facil y precisa informacion relevante a las condiciones climaticas donde operaran sus unidades.
+
+\section*{Análisis del sistema que informa el clima.}
+Recordemos que un web service es un conjunto de protocolos y estándares que sirven para intercambiar datos entre aplicaciónes, tal como lo es OpenWeatherMap el cual fue utilizado para proporcionarnos la información de los países necesarios a través de un API (Application Programming Interfaces), es decir, un conjunto de definiciones y protocolos que se utiliza para desarrollar e integrar el software de las aplicaciones. En este proyecto, se nos proporcionan archivos .csv con información de boletos de vuelo de los cuales se nos encargó la tarea de obtener el informe del clima tanto de la ciudad de salída como la ciudad de llegada, para esto, nosotros modelamos un programa que se conectara a nuestro web service OpenWeatherMap a través de la petición de información y mostrará un informe climático de las ciudades el mismo día en que dicho programa se ejecute.
+
+\section*{El modelo del sistema definitivo.}
+
+Nosotros  utilizamos el paradigma de la programación orientada a objetos, usando el lenguaje Java. Ya que pensamos a las ciudades como objetos de los cuales podríamos acceder a la información, tal como: la descripción del clima, la temperatura y sensación térmica. Además, en nuestra busqueda por recursos de utilidad encontramos la clase URL en la paquetería java.net de Java, la cual permite manipular url's y nos ayudo a conectarnos al servidor de manera sencilla. Y la biblioteca Gson de Google, la cual permite la serialización y deserialización entre objetos Java y su representación en notación JSON, el cual es el tipo de archivo que nos regresaba la petición realizada. Para el modelado, utilizamos los siguientes paquetes y clases de nuestra autoría:
+
+\begin{itemize}
+    \item \textbf{El paquete lib:}
+    En lib se encuentra la estructura principal de nuestro programa, aquí nos encargamos de modelar nuestro objeto que representará a las ciudades, el lector para las listas de datos proporcionadas de los boletos de vuelo en los cuales trabajaremos y el manejo de las peticiones, lib contiene las siguientes clases:
+    \begin{itemize}
+        \item \textbf{Lugar}: La clase lugar es la base para modelar el programa, pues pensando justamente en las ciudades como un Objeto, contando con 6 atributos, los cuales son nombre, país, coordenadas de latitud y longitud, clima y temperatura. Permitiendonos manejar las peticiones, y manejo de informacion de una manera organica e intuitiva.
+        
+        \item \textbf{Lector}: La clase lector es la encargada de procesar los datos dados en los archivos .csv que se nos proporcionaron al inicio del proyecto, además de un archivo adicional iatakey.csv con todos los códigos IATA que nos regresan la clave y la ciudad donde se encuentra dicho aeropuerto.
+        
+        \item \textbf{Conexión}: En la clase conexión es donde estructuramos la URL con la que realizaremos las peticiones a OpenWeatherMap y de la información en formato JSON que nos regresa, la manejamos como un objeto manipulable del cual obtendremos la información necesaria para el informe climático guardandoló en un arreglo y cada que se realice una nueva petición, dicho arreglo se actualizará con la nueva información proporcionada.
+        
+        \item \textbf{Control}: La clase control se programo como una clase auxiliar en el manejo del flujo del programa. Restringiendo la cantidad de actualizaciones que se pueden realizar al dia, el cliente puede estar seguro de tener la informacion en tiempo real sin saturar el web service.
+        
+        \item \textbf{Interfaz}: La clase interfaz es la encargada de estandarizar el formato de salida por consola de los datos, asi como de ofrecer un entorno argadable para el usuario que necesita realizar la consulta.
+        
+    \end{itemize}
+    
+    \item \textbf{El paquete app:}
+    El paquete app es el encargado de contener al archivo que ejecutará todas las funciones necesarias con ayuda de nuestras clases en lib para que nuestro programa cumpla su funcionamiento de manera adecuada:
+     \begin{itemize}
+        \item \textbf{Main}: Nuestra clase principal que conectará las clases contenidas en lib y  dónde sucederá la solicitud de peticiones, el procesamiento de estas de JSON a un objeto "Lugar" y el cache necesario. Además de mostrarnos en pantalla la salida del programa de una forma amigable al usuario.
+    \end{itemize}
+    \item \textbf{La clase test.app.Pruebas:} Todo producto que tiene como destino final un cosumidor dede ser estandarizado y cumplir con una normas minimas de desempeño. La clase Pruebas hace uso de del framework JUnit el cual proporcion codigo especializado para realizar pruebas unitarias. Gracias a JUnit se facilito la tarea de programar 3 sencillas pruebas que nos permiten evaluar el correcto funcionamiento de nuestro programa, principalmente sobre el metodo actualizarCiudad() de la clase Conexion, el cual es el pilar del proyecto.
+\end{itemize}
+\section*{Diagrama de flujo del modelo.}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width = 8 cm]{digramas/Main.png}
+    \caption{Modelo de la clase Main}
+    \label{clase Main}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=14 cm]{digramas/ActualizarCache.png}
+    \caption{Flujo de la información para el método actualizarCache()}
+    \label{actualizar cache}
+\end{figure}
+\clearpage
+\section*{Pensando a futuro. \textit{(Mantenimiento)}}
+A grandes rasgos, a lo largo del proyecto notamos que este programa se ve límitado por las siguientes razónes:
+\begin{itemize}
+    \item \textbf{Cantidad de peticiones}:
+    Debido a que la API key utilizada para el proyecto es gratuita, tenemos un límite de peticiones (60 peticiones máximo durante un periodo concurrente de tiempo) que no debemos sobrepasar ya que OpenWeatherMap nos banearía de sus servicios, tenemos que guardar un tiempo margen para evitar dicha sanción.
+    
+    \item \textbf{Tiempo}:
+    Dado lo anterior, el programa se ve límitado a ser eficaz en cuanto a tiempo debido a dichos tiempos margen que tomamos. Por lo que, al ser una cantitad considerablemente elevada de datos, el programa acumula bastantes tiempos margen entre un límite de peticiones y otro. Llevando la finalización del programa después de 16 - 20 minutos.
+\end{itemize}
+
+Dados los puntos anteriores, consideramos razonable hacer la propuesta al cliente de proporcionarnos el presupuesto adecuado que le incluya:
+\begin{enumerate}
+    \item[1.] \textit{Licencia de API key.} Esto principalmente para cubrir el rango que necesita para las 994 peticiones de este proyecto o si en un futuro se necesitase realizar más de estas peticiones, la eficiencia del tiempo no se vea afectada. Sin problema, nosotros le agregamos la licencia del API key al sistema.
+    
+    \item[2.] \textit{Posibilidad de migración a otros países.} El programa fue diseñado para tomar cualquier país como $"Nacional"$, por lo que el sistema puede utilizarse en distintas partes del mundo y seguir cumpliendo su funcionamiento de manera adecuada.
+    
+    \item[3.] \textit{Actualización del sistema.} Debido a que la estructura del programa es de nuestra total autoría, nosotros le ofrecemos nuestro servicio para mantener el programa en pie y proporcionarle las actualizaciones adecuadas, evitando así que se vuelva obsoleto con el tiempo.
+    
+    \item[4.] \textit{Soporte del sistema.} En dado caso de que sucediera algún error que involucre nuestro sistema, nosotros le incluímos en el presupuesto nuestros servicios cuando sean requeridos.
+\end{enumerate}
+
+Una vez acordado el presupuesto por ambas partes, el cliente podrá utilizar una versión mejorada del sistema que benefície tanto a él como a los usuarios. Sin más que decir, quedamos en contacto y esperamos que el cliente considere la opción de mejorar el sistema.\\
+\begin{center}
+    Por su atención y consideración, gracias.
+\end{center}
+\textbf{Numeros de cuenta:}\\
+Del Moral Morales Francisco Emmanuel: 420003162\\
+G\'omez de la Torre Heidi Lizbeth: 317266245
+\clearpage
+
+\captionsetup[figure]{labelformat=empty} %eliminar figure
+\marginsize{2cm}{2cm}{2.5cm}{2.5cm}
+\pagestyle{empty}
+\begin{figure}[ht]
+    \includegraphics[width = 17cm]{contrapor.png}
+    \caption{}
+    \label{contraportada}
+\end{figure}
+
+\end{document}
